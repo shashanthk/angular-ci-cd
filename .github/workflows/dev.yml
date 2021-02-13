@@ -1,0 +1,39 @@
+name: Angular Build and Deploy
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ dev ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-20.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+
+    steps:
+    - name: Pull updates
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.USER_NAME }}
+        password: ${{ secrets.USER_PASSWD }}
+        port: ${{ secrets.SSH_PORT }}
+        script_stop: true 
+
+        script: |
+          echo "Change directory"
+          cd /home/shashanth/angular-ci-cd
+          echo "Pull changes"
+          git pull
+          echo "Install dependencies"
+          npm install
+          echo "Build project"
+          ng build --prod
